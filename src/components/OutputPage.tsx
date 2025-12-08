@@ -910,23 +910,36 @@ export default function OutputPage({ isDarkMode, onNavigate }: OutputPageProps) 
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
-                  isDarkMode
-                    ? 'bg-cyan-600 hover:bg-cyan-500 text-white'
-                    : 'bg-cyan-600 hover:bg-cyan-500 text-white'
-                }`}>
-                  <Download className="w-4 h-4 inline mr-2" />
-                  Download FASTA
+              <div className="flex flex-col gap-3 pt-4">
+                <button 
+                  onClick={() => onNavigate('report')}
+                  className={`w-full py-3 rounded-lg font-semibold transition-all transform hover:scale-[1.02] ${
+                    isDarkMode
+                      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white'
+                      : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white'
+                  } shadow-lg`}>
+                  <FileText className="w-4 h-4 inline mr-2" />
+                  View Full Report & Deep Analysis
                 </button>
-                <button className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
-                  isDarkMode
-                    ? 'bg-slate-700 hover:bg-slate-600 text-white'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
-                }`}>
-                  <ExternalLink className="w-4 h-4 inline mr-2" />
-                  View in NCBI
-                </button>
+                
+                <div className="flex gap-3">
+                  <button className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
+                    isDarkMode
+                      ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
+                  }`}>
+                    <Download className="w-4 h-4 inline mr-2" />
+                    Download FASTA
+                  </button>
+                  <button className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
+                    isDarkMode
+                      ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-900'
+                  }`}>
+                    <ExternalLink className="w-4 h-4 inline mr-2" />
+                    View in NCBI
+                  </button>
+                </div>
               </div>
             </div>
           </div>

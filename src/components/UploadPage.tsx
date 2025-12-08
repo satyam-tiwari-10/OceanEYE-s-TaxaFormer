@@ -167,13 +167,22 @@ export default function UploadPage({ isDarkMode, onNavigate }: UploadPageProps) 
       console.log("📁 File:", uploadedFiles[0].name);
       console.log("🔗 API URL:", API_URL);
 
-      const response = await fetch(`${API_URL}/analyze`, {
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000)
+      );
+
+      // Create the fetch promise
+      const fetchPromise = fetch(`${API_URL}/analyze`, {
         method: 'POST',
         body: formData,
         headers: {
           'ngrok-skip-browser-warning': 'true',
         },
       });
+
+      // Race between fetch and timeout
+      const response = await Promise.race([fetchPromise, timeoutPromise]) as Response;
 
       console.log("📡 Response Status:", response.status);
 
@@ -211,12 +220,63 @@ export default function UploadPage({ isDarkMode, onNavigate }: UploadPageProps) 
         onNavigate('output');
       } else {
         console.error("❌ Server returned error:", result.message);
-        alert("Server Error: " + (result.message || "Unknown error"));
+        throw new Error("Server Error: " + (result.message || "Unknown error"));
       }
     } catch (error) {
       console.error("❌ Connection Failed:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      alert(`Failed to connect to AI Server.\n\nError: ${errorMessage}\n\nTroubleshooting:\n1. Check if backend is running\n2. Verify API URL is correct: ${API_URL || '(empty)'}\n3. Check browser console (F12) for details\n4. Ensure CORS is enabled on backend\n\nTip: Leave API_URL empty to use mock data for testing`);
+      
+      // Auto-fallback to mock data
+      console.log("⚠️ Falling back to mock data...");
+      
+      const mockData = {
+        metadata: {
+          sampleName: uploadedFiles[0].name,
+          totalSequences: 150,
+          processingTime: "Mock",
+          avgConfidence: 89
+        },
+        taxonomy_summary: [
+          { name: 'Alveolata', value: 45, color: '#22D3EE' },
+          { name: 'Chlorophyta', value: 32, color: '#10B981' },
+          { name: 'Fungi', value: 15, color: '#A78BFA' },
+          { name: 'Metazoa', value: 28, color: '#F59E0B' },
+          { name: 'Rhodophyta', value: 18, color: '#EC4899' },
+          { name: 'Unknown', value: 12, color: '#64748B' }
+        ],
+        sequences: [
+          { accession: 'SEQ_001', taxonomy: 'Alveolata; Dinoflagellata; Gymnodiniales', length: 1842, confidence: 0.94, overlap: 87, cluster: 'C1' },
+          { accession: 'SEQ_002', taxonomy: 'Chlorophyta; Chlorophyceae; Chlamydomonadales', length: 1654, confidence: 0.89, overlap: 92, cluster: 'C2' },
+          { accession: 'SEQ_003', taxonomy: 'Metazoa; Arthropoda; Copepoda', length: 2103, confidence: 0.96, overlap: 94, cluster: 'C3' },
+          { accession: 'SEQ_004', taxonomy: 'Unknown; Novel Cluster A', length: 1723, confidence: 0.42, overlap: 34, cluster: 'N1' },
+          { accession: 'SEQ_005', taxonomy: 'Rhodophyta; Florideophyceae; Ceramiales', length: 1889, confidence: 0.91, overlap: 88, cluster: 'C4' },
+        ],
+        cluster_data: [
+          { x: 12.5, y: 8.3, z: 45, cluster: 'Alveolata', color: '#22D3EE' },
+          { x: -8.2, y: 15.1, z: 32, cluster: 'Chlorophyta', color: '#10B981' },
+          { x: 3.4, y: -12.7, z: 28, cluster: 'Metazoa', color: '#F59E0B' },
+          { x: -15.8, y: -5.2, z: 18, cluster: 'Rhodophyta', color: '#EC4899' },
+          { x: 18.3, y: 2.1, z: 15, cluster: 'Fungi', color: '#A78BFA' },
+          { x: -2.1, y: -18.5, z: 12, cluster: 'Unknown', color: '#64748B' },
+        ]
+      };
+
+      // Complete the progress bar
+      setProgress(100);
+      setLoadingStage(loadingStages.length - 1);
+
+      // Wait a moment to show completion
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Save mock data
+      localStorage.setItem('analysisResults', JSON.stringify(mockData));
+      console.log("💾 Saved mock data to localStorage (API failed)");
+
+      // Show a notification that mock data is being used
+      alert(`⚠️ API Connection Failed\n\nError: ${errorMessage}\n\n✅ Using mock data for demonstration.\n\nTo connect to your backend:\n1. Ensure backend is running\n2. Update API_URL in UploadPage.tsx\n3. Check CORS settings\n\nClick OK to view mock results.`);
+
+      // Navigate to results with mock data
+      onNavigate('output');
     } finally {
       setIsLoading(false);
     }

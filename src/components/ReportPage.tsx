@@ -15,14 +15,21 @@ export default function ReportPage({ isDarkMode, onNavigate }: ReportPageProps) 
   // --- LOAD DATA FROM LOCALSTORAGE ---
   useEffect(() => {
     const savedData = localStorage.getItem('analysisResults');
+    console.log('🔍 Report Page - Checking localStorage...');
+    console.log('📦 Raw savedData:', savedData ? 'Data exists' : 'No data');
+    
     if (savedData) {
       try {
         const parsed = JSON.parse(savedData);
         console.log('📊 Report Page - Loaded Data:', parsed);
+        console.log('📊 Data keys:', Object.keys(parsed));
+        console.log('📊 Sequences count:', parsed.sequences?.length || 0);
         setAnalysisData(parsed);
       } catch (e) {
-        console.error("Failed to load report data", e);
+        console.error("❌ Failed to parse report data:", e);
       }
+    } else {
+      console.warn('⚠️ No data in localStorage with key "analysisResults"');
     }
     setLoading(false);
   }, []);
@@ -238,6 +245,10 @@ export default function ReportPage({ isDarkMode, onNavigate }: ReportPageProps) 
 
   // No data state
   if (!analysisData || stats.total === 0) {
+    console.warn('⚠️ No data available for report');
+    console.log('analysisData:', analysisData);
+    console.log('stats.total:', stats.total);
+    
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center">
         <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -246,6 +257,11 @@ export default function ReportPage({ isDarkMode, onNavigate }: ReportPageProps) 
         <p className={`mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
           Please upload and analyze a sequence file first to generate a report.
         </p>
+        {analysisData && (
+          <div className={`mb-4 text-sm ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            Debug: Data exists but has {stats.total} sequences
+          </div>
+        )}
         <button
           onClick={() => onNavigate('upload')}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -417,7 +433,7 @@ export default function ReportPage({ isDarkMode, onNavigate }: ReportPageProps) 
               }`}>
                 {stats.diversityMetrics.shannonIndex > 2.5 ? '✓ High Diversity' : 
                  stats.diversityMetrics.shannonIndex > 1.5 ? '○ Moderate Diversity' : '△ Low Diversity'}
-              </p>
+              </div>
             </div>
 
             <div className={`rounded-lg p-5 ${
@@ -444,7 +460,7 @@ export default function ReportPage({ isDarkMode, onNavigate }: ReportPageProps) 
               }`}>
                 {stats.diversityMetrics.simpsonIndex > 0.8 ? '✓ Highly Diverse' : 
                  stats.diversityMetrics.simpsonIndex > 0.5 ? '○ Moderately Diverse' : '△ Low Diversity'}
-              </p>
+              </div>
             </div>
 
             <div className={`rounded-lg p-5 ${
@@ -471,7 +487,7 @@ export default function ReportPage({ isDarkMode, onNavigate }: ReportPageProps) 
               }`}>
                 {stats.diversityMetrics.evenness > 0.7 ? '✓ Balanced Community' : 
                  stats.diversityMetrics.evenness > 0.4 ? '○ Somewhat Balanced' : '△ Dominated by Few'}
-              </p>
+              </div>
             </div>
           </div>
 
