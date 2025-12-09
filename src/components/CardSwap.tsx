@@ -54,7 +54,7 @@ const CardSwap: React.FC<CardSwapProps> = ({
   easing = 'elastic',
   children
 }) => {
-  const config =
+  const config = useMemo(() => 
     easing === 'elastic'
       ? {
           ease: 'elastic.out(0.6,0.9)',
@@ -71,7 +71,8 @@ const CardSwap: React.FC<CardSwapProps> = ({
           durReturn: 0.8,
           promoteOverlap: 0.45,
           returnDelay: 0.2
-        };
+        }, 
+  [easing]);
 
   const childArr = useMemo(() => Children.toArray(children), [children]);
   const refs = useMemo(
@@ -178,21 +179,37 @@ const CardSwap: React.FC<CardSwapProps> = ({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, easing, config, refs]);
+  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount, config, refs]);
 
-  const rendered = childArr.map((child, i) =>
-    isValidElement(child)
-      ? cloneElement(child as React.ReactElement<any>, {
-          key: i,
-          ref: refs[i],
-          style: { width, height, ...((child as any).props?.style ?? {}) },
-          onClick: (e: React.MouseEvent) => {
-            child.props.onClick?.(e);
-            onCardClick?.(i);
+  // --- FIX APPLIED HERE ---
+  // Safely mapping children with correct type casting
+  const rendered = childArr.map((child, i) => {
+    if (isValidElement(child)) {
+      // Cast child to a React Element with basic props so we can access them safely
+      const childElement = child as React.ReactElement<any>;
+      
+      return cloneElement(childElement, {
+        key: i,
+        ref: refs[i],
+        style: {
+          width,
+          height,
+          ...(childElement.props.style || {})
+        },
+        onClick: (e: React.MouseEvent) => {
+          // Safely call existing onClick handler if it exists
+          if (childElement.props.onClick) {
+            childElement.props.onClick(e);
           }
-        })
-      : child
-  );
+          // Call the swap specific click handler
+          if (onCardClick) {
+            onCardClick(i);
+          }
+        }
+      });
+    }
+    return child;
+  });
 
   return (
     <div ref={container} className="card-swap-container" style={{ width, height }}>
