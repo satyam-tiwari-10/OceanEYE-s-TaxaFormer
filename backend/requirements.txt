@@ -7,6 +7,9 @@ uvicorn[standard]==0.32.1
 # File handling
 python-multipart==0.0.20
 
+# Database
+psycopg2-binary==2.9.9
+
 # Ngrok tunneling for Kaggle hosting
 pyngrok==7.2.2
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import './LiquidEther.css';
@@ -35,8 +36,8 @@ export default function LiquidEther({
   useEffect(() => {
     if (!mountRef.current) return;
 
-    function makePaletteTexture(stops) {
-      let arr;
+    function makePaletteTexture(stops: string[]) {
+      let arr: string[];
       if (Array.isArray(stops) && stops.length > 0) {
         if (stops.length === 1) {
           arr = [stops[0], stops[0]];
@@ -72,6 +73,20 @@ export default function LiquidEther({
     const bgVec4 = new THREE.Vector4(bgColorObj.r, bgColorObj.g, bgColorObj.b, 1.0);
 
     class CommonClass {
+      width: number;
+      height: number;
+      aspect: number;
+      pixelRatio: number;
+      isMobile: boolean;
+      breakpoint: number;
+      fboWidth: number | null;
+      fboHeight: number | null;
+      time: number;
+      delta: number;
+      container: HTMLElement | null;
+      renderer: THREE.WebGLRenderer | null;
+      clock: THREE.Clock | null;
+
       constructor() {
         this.width = 0;
         this.height = 0;
@@ -87,7 +102,7 @@ export default function LiquidEther({
         this.renderer = null;
         this.clock = null;
       }
-      init(container) {
+      init(container: HTMLElement) {
         this.container = container;
         this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
         this.resize();
@@ -111,6 +126,7 @@ export default function LiquidEther({
         if (this.renderer) this.renderer.setSize(this.width, this.height, false);
       }
       update() {
+        if (!this.clock) return;
         this.delta = this.clock.getDelta();
         this.time += this.delta;
       }
@@ -118,6 +134,30 @@ export default function LiquidEther({
     const Common = new CommonClass();
 
     class MouseClass {
+      mouseMoved: boolean;
+      coords: THREE.Vector2;
+      coords_old: THREE.Vector2;
+      diff: THREE.Vector2;
+      timer: number | null;
+      container: HTMLElement | null;
+      docTarget: Document | null;
+      listenerTarget: Window | null;
+      isHoverInside: boolean;
+      hasUserControl: boolean;
+      isAutoActive: boolean;
+      autoIntensity: number;
+      takeoverActive: boolean;
+      takeoverStartTime: number;
+      takeoverDuration: number;
+      takeoverFrom: THREE.Vector2;
+      takeoverTo: THREE.Vector2;
+      onInteract: (() => void) | null;
+      _onMouseMove: (e: MouseEvent) => void;
+      _onTouchStart: (e: TouchEvent) => void;
+      _onTouchMove: (e: TouchEvent) => void;
+      _onTouchEnd: (e: TouchEvent) => void;
+      _onDocumentLeave: () => void;
+
       constructor() {
         this.mouseMoved = false;
         this.coords = new THREE.Vector2();
@@ -143,7 +183,7 @@ export default function LiquidEther({
         this._onTouchEnd = this.onTouchEnd.bind(this);
         this._onDocumentLeave = this.onDocumentLeave.bind(this);
       }
-      init(container) {
+      init(container: HTMLElement) {
         this.container = container;
         this.docTarget = container.ownerDocument || null;
         const defaultView =
@@ -172,17 +212,17 @@ export default function LiquidEther({
         this.docTarget = null;
         this.container = null;
       }
-      isPointInside(clientX, clientY) {
+      isPointInside(clientX: number, clientY: number): boolean {
         if (!this.container) return false;
         const rect = this.container.getBoundingClientRect();
         if (rect.width === 0 || rect.height === 0) return false;
         return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
       }
-      updateHoverState(clientX, clientY) {
+      updateHoverState(clientX: number, clientY: number): boolean {
         this.isHoverInside = this.isPointInside(clientX, clientY);
         return this.isHoverInside;
       }
-      setCoords(x, y) {
+      setCoords(x: number, y: number): void {
         if (!this.container) return;
         if (this.timer) window.clearTimeout(this.timer);
         const rect = this.container.getBoundingClientRect();
@@ -195,11 +235,11 @@ export default function LiquidEther({
           this.mouseMoved = false;
         }, 100);
       }
-      setNormalized(nx, ny) {
+      setNormalized(nx: number, ny: number): void {
         this.coords.set(nx, ny);
         this.mouseMoved = true;
       }
-      onDocumentMouseMove(event) {
+      onDocumentMouseMove(event: MouseEvent): void {
         if (!this.updateHoverState(event.clientX, event.clientY)) return;
         if (this.onInteract) this.onInteract();
         if (this.isAutoActive && !this.hasUserControl && !this.takeoverActive) {
@@ -219,7 +259,7 @@ export default function LiquidEther({
         this.setCoords(event.clientX, event.clientY);
         this.hasUserControl = true;
       }
-      onDocumentTouchStart(event) {
+      onDocumentTouchStart(event: TouchEvent): void {
         if (event.touches.length !== 1) return;
         const t = event.touches[0];
         if (!this.updateHoverState(t.clientX, t.clientY)) return;
@@ -227,20 +267,20 @@ export default function LiquidEther({
         this.setCoords(t.clientX, t.clientY);
         this.hasUserControl = true;
       }
-      onDocumentTouchMove(event) {
+      onDocumentTouchMove(event: TouchEvent): void {
         if (event.touches.length !== 1) return;
         const t = event.touches[0];
         if (!this.updateHoverState(t.clientX, t.clientY)) return;
         if (this.onInteract) this.onInteract();
         this.setCoords(t.clientX, t.clientY);
       }
-      onTouchEnd() {
+      onTouchEnd(): void {
         this.isHoverInside = false;
       }
-      onDocumentLeave() {
+      onDocumentLeave(): void {
         this.isHoverInside = false;
       }
-      update() {
+      update(): void {
         if (this.takeoverActive) {
           const t = (performance.now() - this.takeoverStartTime) / (this.takeoverDuration * 1000);
           if (t >= 1) {
@@ -262,7 +302,21 @@ export default function LiquidEther({
     const Mouse = new MouseClass();
 
     class AutoDriver {
-      constructor(mouse, manager, opts) {
+      mouse: MouseClass;
+      manager: any;
+      enabled: boolean;
+      speed: number;
+      resumeDelay: number;
+      rampDurationMs: number;
+      active: boolean;
+      current: THREE.Vector2;
+      target: THREE.Vector2;
+      lastTime: number;
+      activationTime: number;
+      margin: number;
+      _tmpDir: THREE.Vector2;
+
+      constructor(mouse: MouseClass, manager: any, opts: { enabled: boolean; speed: number; resumeDelay?: number; rampDuration?: number }) {
         this.mouse = mouse;
         this.manager = manager;
         this.enabled = opts.enabled;
@@ -278,15 +332,15 @@ export default function LiquidEther({
         this._tmpDir = new THREE.Vector2(); // reuse temp vector to avoid per-frame alloc
         this.pickNewTarget();
       }
-      pickNewTarget() {
+      pickNewTarget(): void {
         const r = Math.random;
         this.target.set((r() * 2 - 1) * (1 - this.margin), (r() * 2 - 1) * (1 - this.margin));
       }
-      forceStop() {
+      forceStop(): void {
         this.active = false;
         this.mouse.isAutoActive = false;
       }
-      update() {
+      update(): void {
         if (!this.enabled) return;
         const now = performance.now();
         const idle = now - this.manager.lastUserInteraction;

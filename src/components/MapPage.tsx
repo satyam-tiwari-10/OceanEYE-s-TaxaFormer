@@ -419,7 +419,7 @@ export default function MapPage({ isDarkMode, onNavigate }: MapPageProps) {
       });
 
       // Add hover effect
-      marker.on('mouseover', function () {
+      marker.on('mouseover', function (this: L.Marker) {
         this.openPopup();
       });
     });
@@ -554,7 +554,7 @@ export default function MapPage({ isDarkMode, onNavigate }: MapPageProps) {
       </div>
     `);
 
-    marker.on('mouseover', function () {
+    marker.on('mouseover', function (this: L.Marker) {
       this.openPopup();
     });
   };

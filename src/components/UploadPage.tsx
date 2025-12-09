@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Upload, FileText, Database, ChevronRight, Loader2, Cpu, Zap, Brain, CheckCircle2, MapPin, Calendar, Thermometer, Droplets, Info } from 'lucide-react';
 
-// 🛑 STEP 1: PASTE YOUR NGROK URL HERE
-// Leave empty to use mock data for testing
-// Set to "" to test UI without backend, or paste your active ngrok URL
-const API_URL: string = "https://unexcited-nondepreciatively-justice.ngrok-free.dev";
+// 🔧 API Configuration
+// Use environment variable or fallback to localhost
+// In Docker: backend service name, Outside Docker: localhost
+const API_URL: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface UploadPageProps {
   isDarkMode: boolean;
@@ -303,12 +303,9 @@ export default function UploadPage({ isDarkMode, onNavigate }: UploadPageProps) 
       console.log("⏳ No timeout - will wait as long as needed for GPU processing...");
 
       // NO TIMEOUT - Let it process as long as needed
-      const response = await fetch(`${API_URL}/analyze`, {
+      const response = await fetch(`${API_URL}/analyse`, {
         method: 'POST',
         body: formData,
-        headers: {
-          'ngrok-skip-browser-warning': 'true',
-        },
       });
 
       console.log("📡 Response Status:", response.status);

@@ -13,18 +13,34 @@ Transform environmental DNA sequences into biodiversity insights using Nucleotid
 
 ## 🚀 Getting Started
 
-### Prerequisites
+### Option 1: Docker (Recommended - Everything Included)
 
-- Node.js 18+ 
-- npm or yarn
+**Prerequisites:** Docker Desktop
 
-### Installation
+```bash
+# Start everything (Frontend + Backend + Database)
+docker-compose up -d
+
+# Or use the script
+docker-start-all.bat
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+See `DOCKER_FULL_STACK.md` for complete Docker guide.
+
+### Option 2: Local Development
+
+**Prerequisites:** Node.js 18+, npm or yarn
 
 ```bash
 # Install dependencies
 npm install --legacy-peer-deps
 
-# Run development server
+# Start backend (in separate terminal)
+docker-compose up -d postgres backend
+
+# Run frontend
 npm run dev
 ```
 

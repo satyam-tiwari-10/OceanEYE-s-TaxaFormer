@@ -170,7 +170,7 @@ export default function MapPage({ isDarkMode, onNavigate }: MapPageProps) {
       `;
 
       marker.bindPopup(popupContent);
-      marker.on('mouseover', function () {
+      marker.on('mouseover', function (this: L.Marker) {
         this.openPopup();
       });
     });

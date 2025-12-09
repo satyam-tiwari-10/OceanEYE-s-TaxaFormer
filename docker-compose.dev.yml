@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: taxaformer-db
+    environment:
+      POSTGRES_DB: taxaformer_db
+      POSTGRES_USER: taxaformer_user
+      POSTGRES_PASSWORD: taxaformer_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taxaformer_user -d taxaformer_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Development mode with hot reload)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taxaformer-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: taxaformer_db
+      DB_USER: taxaformer_user
+      DB_PASSWORD: taxaformer_password
+      KAGGLE_NGROK_URL: https://unexcited-nondepreciatively-justice.ngrok-free.dev
+      KAGGLE_TIMEOUT: 300
+      PORT: 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python main_new.py
+
+  # Frontend (Development mode with hot reload)
+  frontend:
+    image: node:20-alpine
+    container_name: taxaformer-frontend-dev
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - backend
+    command: sh -c "npm install --legacy-peer-deps && npm run dev"
+
+volumes:
+  postgres_data:
