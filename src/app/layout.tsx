@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Taxaformer - AI-Powered eDNA Classification",
+  title: "Taxaformer",
   description: "Transform environmental DNA sequences into biodiversity insights using Nucleotide Transformer AI",
   icons: {
-    icon: '/taxaformer-icon.svg',
-    shortcut: '/taxaformer-icon.svg',
-    apple: '/taxaformer-icon.svg',
+    icon: '/taxaformer-icon.jpeg',
+    shortcut: '/taxaformer-icon.jpeg',
+    apple: '/taxaformer-icon.jpeg',
   },
 };
 
