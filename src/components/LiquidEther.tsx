@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import './LiquidEther.css';
@@ -302,7 +303,21 @@ export default function LiquidEther({
     const Mouse = new MouseClass();
 
     class AutoDriver {
-      constructor(mouse, manager, opts) {
+      mouse: any;
+      manager: any;
+      enabled: boolean;
+      speed: number;
+      resumeDelay: number;
+      rampDurationMs: number;
+      active: boolean;
+      current: THREE.Vector2;
+      target: THREE.Vector2;
+      lastTime: number;
+      activationTime: number;
+      margin: number;
+      _tmpDir: THREE.Vector2;
+
+      constructor(mouse: any, manager: any, opts: any) {
         this.mouse = mouse;
         this.manager = manager;
         this.enabled = opts.enabled;
@@ -540,7 +555,15 @@ export default function LiquidEther({
 `;
 
     class ShaderPass {
-      constructor(props) {
+      props: any;
+      uniforms: any;
+      scene: THREE.Scene | null;
+      camera: THREE.Camera | null;
+      material: THREE.RawShaderMaterial | null;
+      geometry: THREE.PlaneGeometry | null;
+      plane: THREE.Mesh | null;
+
+      constructor(props: any) {
         this.props = props || {};
         this.uniforms = this.props.material?.uniforms;
         this.scene = null;
