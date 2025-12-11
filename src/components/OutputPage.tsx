@@ -342,17 +342,17 @@ export default function OutputPage({ isDarkMode, onNavigate }: OutputPageProps) 
             glareSize={300}
             transitionDuration={750}
             playOnce={false}
-            borderColor={isDarkMode ? '#334155' : '#475569'} // Changed border to neutral slate
+            borderColor={isDarkMode ? '#334155' : '#475569'}
             borderRadius="1rem"
           >
             <div className={`p-6 rounded-2xl backdrop-blur-md h-full ${
-              isDarkMode ? 'bg-black border-slate-800' : 'bg-slate-950 border-slate-800' // Changed to Black/Dark Slate
+              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white/50 border-slate-200'
             } border-2`}>
               <div className="flex items-center gap-3 mb-6">
-                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-slate-800' : 'bg-slate-800'}`}>
-                  <Sparkles className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-400'}`} />
+                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'}`}>
+                  <Sparkles className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
-                <h2 className={`font-bold ${isDarkMode ? 'text-white' : 'text-white'}`}>
+                <h2 className={`font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                   Novel Species Detected
                 </h2>
               </div>
@@ -362,12 +362,12 @@ export default function OutputPage({ isDarkMode, onNavigate }: OutputPageProps) 
                 <div className={`text-6xl mb-4 font-bold ${isDarkMode ? 'text-purple-400' : 'text-purple-400'}`}>
                   {stats.novelCount}
                 </div>
-                <p className={`text-sm mb-8 ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`}>
+                <p className={`text-sm mb-8 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Unassigned sequences found
                 </p>
                 
-                <div className={`p-4 rounded-lg mb-6 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-900'} border border-slate-800`}>
-                  <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-400'}`}>
+                <div className={`p-4 rounded-lg mb-6 ${isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-100 border-slate-300'} border`}>
+                  <p className={`text-xs ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                     These sequences do not match PR2/SILVA references. Detected using transformer embeddings + clustering analysis.
                   </p>
                 </div>
@@ -381,21 +381,21 @@ export default function OutputPage({ isDarkMode, onNavigate }: OutputPageProps) 
                 </button>
               </div>
 
-              <div className={`mt-6 p-4 rounded-lg ${isDarkMode ? 'bg-slate-900' : 'bg-slate-900'} border border-slate-800`}>
+              <div className={`mt-6 p-4 rounded-lg ${isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-100 border-slate-300'} border`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertCircle className={`w-4 h-4 ${isDarkMode ? 'text-cyan-400' : 'text-cyan-400'}`} />
-                  <span className={`text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-white'}`}>
+                  <AlertCircle className={`w-4 h-4 ${isDarkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
+                  <span className={`text-xs font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                     Novelty Metrics
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <p className={isDarkMode ? 'text-slate-400' : 'text-slate-400'}>Novel Sequences</p>
-                    <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-white'}`}>{stats.novelCount}</p>
+                    <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>Novel Sequences</p>
+                    <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{stats.novelCount}</p>
                   </div>
                   <div>
-                    <p className={isDarkMode ? 'text-slate-400' : 'text-slate-400'}>Novel Rate</p>
-                    <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-white'}`}>{stats.total > 0 ? ((stats.novelCount / stats.total) * 100).toFixed(1) : 0}%</p>
+                    <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>Novel Rate</p>
+                    <p className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{stats.total > 0 ? ((stats.novelCount / stats.total) * 100).toFixed(1) : 0}%</p>
                   </div>
                 </div>
               </div>
