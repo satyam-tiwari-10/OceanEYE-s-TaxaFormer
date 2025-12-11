@@ -7,6 +7,8 @@ Your backend should return JSON in this format:
 ```json
 {
   "status": "success",
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "cached": false,
   "data": {
     "metadata": {
       "sampleName": "sample_file.fasta",
@@ -50,6 +52,12 @@ Your backend should return JSON in this format:
 ```
 
 ## Field Descriptions
+
+### Root Level Fields
+- `status`: "success" or "error"
+- `job_id`: Unique identifier for this analysis job (UUID format)
+- `cached`: Boolean indicating if result was returned from cache
+- `data`: The analysis results object
 
 ### metadata
 - `sampleName`: Name of the uploaded file
